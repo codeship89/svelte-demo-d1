@@ -1,11 +1,16 @@
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const GET: RequestHandler = async function({ request, platform }) {    
+export const GET: RequestHandler = async function({ request, platform }) {      
   if (platform) {
-    let result = await platform.env.DB.prepare(
-      "SELECT * FROM users LIMIT 5"
-    ).run();
-    return new Response(JSON.stringify(result));
+    console.log("has platform ... ")
+    try {
+      let result = await platform.env.DB.prepare(
+        "SELECT * FROM users LIMIT 5"
+      ).all();      
+      return new Response(JSON.stringify(result));
+    } catch (e: any) {
+      return new Response(e.cause);
+    }
   }
-  return new Response("not found")
+  return new Response(JSON.stringify({"status": "not ok"}))
 }
